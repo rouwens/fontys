@@ -11,11 +11,13 @@ def func_ping():
             ping_log.write("Host is bereikbaar")
             date
             ping_log.write("\n")
+            ping_log.write("\n")
 
     else:
         with open("ping.log", "a") as ping_log:
             ping_log.write("Host is niet bereikbaar")
             date
+            ping_log.write("\n")
             ping_log.write("\n")
 
     time.sleep (timer)
