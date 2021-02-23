@@ -1,0 +1,4 @@
+Basis - https://stackoverflow.com/questions/26468640/python-function-to-test-ping/39563638
+Timer - https://www.tutorialspoint.com/python3/time_sleep.htm
+Functie - https://www.digitalocean.com/community/tutorials/how-to-define-functions-in-python-3
+Schijven naar bestanden vanuit Python 3 - https://stackoverflow.com/questions/20429246/how-to-write-to-txt-files-in-python-3
