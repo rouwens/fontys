@@ -3,7 +3,7 @@ import time
 
 def func_ping():
     timer = 5
-    ping = os.system("ping -c 1 rpi.lani")
+    ping = os.system("ping -c 1 google.com")
     date = os.system("date >> ping.log")
 
     if ping == 0:
