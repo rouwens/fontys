@@ -1,11 +1,11 @@
 import os
-#import subprocess
 import linecache
 
-#ipv4 = os.system("ifconfig wlp2s0 | grep inet | awk '$1 == 'inet' { print $2 }'")
-#ipv4 = subprocess.run(["ifconfig wlp2s0 | grep inet | awk '$1 == 'inet' { print $2 }'"])
-#test = subprocess.run(["ifconfig wlp2s0 | grep inet | awk '$1 == "inet" { print $2 }'""])
-os.system("bash import.bash")
+#os.system("bash import.bash")
+print ("Enter the name from the network interface")
+interface = input()
+cmd ="bash import.bash {0}".format(interface)
+os.system(cmd)
 
 ip = linecache.getline('info.txt', 1)
 netmask = linecache.getline('info.txt', 2)
