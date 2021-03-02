@@ -1,7 +1,7 @@
-import os
-
-print ("Type s of l")
-var = input()
-cmd = "ls -{0}".format(var)
-test = os.system(cmd)
-print
+import string 
+pwd="hello."
+leestekentest = set(string.punctuation)
+if any(str in leestekentest for str in pwd):
+    print ("invalid")
+else:
+    print("valid")
