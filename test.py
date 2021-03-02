@@ -1,7 +1,5 @@
-import string 
-pwd="hello."
-leestekentest = set(string.punctuation)
-if any(str in leestekentest for str in pwd):
-    print ("invalid")
-else:
-    print("valid")
+import subprocess
+
+text = input()
+ping = subprocess.check_output (['echo', text])
+print (ping)
