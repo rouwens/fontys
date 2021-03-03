@@ -27,7 +27,7 @@ def func_ping(url):
     func_ping(url)
 
 
-print ("Vul hier de URL in van de website die je wilt monitoren op de beschikbaarheid")
+print ("Vul hier de URL in van de website die je wilt checken op de beschikbaarheid")
 url = input()
 func_ping(url)
 
