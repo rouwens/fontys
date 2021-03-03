@@ -5,12 +5,8 @@ print ("Vul hier de naam van je netwerkkaart")
 kaart = input()
 
 # Hiermee word de output van ifconfig opgeslagen in een string.
-#x = subprocess.check_output (['ifconfig', 'wlp2s0'])
-#text = str(x)
-
 x = subprocess.check_output (['ifconfig', kaart])
 text = str(x)
-
 
 #Hiermee word de route tabel van het systeem uitgelezen
 y = subprocess.check_output(['ip', 'r'])
