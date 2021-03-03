@@ -27,7 +27,7 @@ if find > -1:
 elif letter_test == False:
     print ("Het wachtwoord bevat geen hoofdletter en/of kleine letter.")
 
-elif lengte_test < 9:
+elif lengte_test < 10:
     print ("Het wachtwoord voldoet niet aan de minimale lengte.")
 
 elif cijfer_test == False:
