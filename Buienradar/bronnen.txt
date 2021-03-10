@@ -1,0 +1,2 @@
+Config parser python3 - https://betterprogramming.pub/tips-and-tricks-for-handling-configuration-files-in-python-a9d7429aa50b
+Buienradar - https://pypi.org/project/buienradar/

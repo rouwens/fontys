@@ -1,4 +1,22 @@
-from ldap3 import Server, Connection, ALL
-server =Server('192.168.195.144', get_info=ALL)
-conn = Connection(server, 'cn=admin,dc=rouwens,dc=com', 'welkom01', auto_bind=True)
-conn.add('cn=Lieke Rouwens,ou=gebruikers,dc=rouwens,dc=com', 'inetOrgPerson', {'givenName': 'Lieke', 'sn': 'Rouwens', 'uid': 'lrouwens'})
+from buienradar.buienradar import (get_data, parse_data)
+from buienradar.constants import (CONTENT, RAINCONTENT, SUCCESS)
+
+# minutes to look ahead for precipitation forecast
+# (5..120)
+timeframe = 45
+
+# gps-coordinates for the weather data
+latitude = 52.1
+longitude = 5.10
+
+result = get_data(latitude=latitude,
+                  longitude=longitude,
+                  )
+
+if result.get(SUCCESS):
+    data = result[CONTENT]
+    raindata = result[RAINCONTENT]
+
+    result = parse_data(data, raindata, latitude, longitude, timeframe)
+
+print(result)
