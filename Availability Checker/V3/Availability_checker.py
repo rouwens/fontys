@@ -21,8 +21,8 @@ def start():
 
             db = mysql.connect(
                 host = "rouwens.ddns.net",
-                user = "drouwens-remote",
-                passwd = "Daan04092000.",
+                user = "fontys",
+                passwd = "E6g2sAnv4FHBB4HB",
                 database = "availability-checker"
             )
             cursor = db.cursor()
@@ -52,8 +52,8 @@ def start():
             
         db = mysql.connect(
             host = "192.168.178.254",
-            user = "drouwens-remote",
-            passwd = "Daan04092000.",
+            user = "fontys",
+            passwd = "E6g2sAnv4FHBB4HB",
             database = "availability-checker"
                 )
         cursor = db.cursor()
