@@ -1,0 +1,3 @@
+interpuncties uit string verwijderen - https://www.geeksforgeeks.org/python-remove-punctuation-from-string/
+willekeurige string genereren - https://pynative.com/python-generate-random-string/
+Hashlib gebruiken - https://www.thepythoncode.com/article/hashing-functions-in-python-using-hashlib

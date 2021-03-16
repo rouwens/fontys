@@ -5,7 +5,7 @@ Schijven naar bestanden vanuit Python 3 - https://stackoverflow.com/questions/20
 
 V3
 datetime - https://www.w3schools.com/python/python_datetime.asp
-sql statement in Python3 -  https://stackoverflow.com/questions/902408/how-to-use-variables-in-sql-statement-in-python
+sql in Python3 -  https://stackoverflow.com/questions/902408/how-to-use-variables-in-sql-statement-in-python
                             https://www.datacamp.com/community/tutorials/mysql-python#ID
                             https://pynative.com/python-mysql-select-query-to-fetch-data/
                             https://www.techonthenet.com/sql/where.php
