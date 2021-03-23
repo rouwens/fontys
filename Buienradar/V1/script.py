@@ -26,7 +26,6 @@ def start(lati, longi, tijd, locatie):
                     result = parse_data(data, raindata, latitude, longitude, timeframe)
                 
                 locatie = locatie
-                print (result)
                 stringresult = str(result)
                 
                 # Tempratuur uit de string filteren.
