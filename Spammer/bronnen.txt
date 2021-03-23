@@ -1,0 +1,1 @@
+Mail template - https://mkyong.com/python/how-do-send-email-in-python-via-smtplib/
