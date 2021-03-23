@@ -8,6 +8,58 @@ import hashlib
 
 def start():
 
+    def funcgebruiker (username):
+        username = username
+        db = mysql.connect(
+            host = "rouwens.ddns.net",
+            user = "fontys",
+            passwd = "E6g2sAnv4FHBB4HB",
+            database = "passwordmanager"
+            )
+        cursor = db.cursor()
+
+        tableSQL = """SELECT added_table FROM `accounts` WHERE `username` = %s"""
+        cursor.execute(tableSQL, (username,))
+        tableFETCH = cursor.fetchall()
+        strtableFETCH = str(tableFETCH)
+        added_table = re.sub(r'[^\w\s]', '', strtableFETCH)
+        
+        print()
+        print ("Ingelogd als gebruiker " + username)
+        print ("")
+        print ("1 - Naar wachtwoorden gaan")
+        print ("2 - Instellingen")
+        print ("")
+        print ("3 - stoppen")
+        print ("")
+        
+        if added_table == "0":
+            print ("Database bestaat nog niet type init om het aan te maken")
+        
+        keuze = input()
+        if keuze == "1":
+            print ("Keuze 1")
+        
+        elif keuze == "2":
+            print ("Keuze 2")
+        
+        elif keuze == "3":
+            exit()
+        
+        elif keuze == "init":
+            switch = """UPDATE `accounts` SET `added_table` = '1' WHERE `accounts`.`username` = %s;"""
+            cursor.execute(switch, (username,))
+            createtable = """CREATE TABLE `passwordmanager`.`%s` ( `ID` INT(255) NOT NULL , `name` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL ) ENGINE = InnoDB;"""
+            cursor.execute(createtable, (username,))
+            print ()
+            print ("Database aangemaakt")
+            funcgebruiker (username)
+
+        
+
+    
+
+    # Dit is het login scherm
     def inloggen():
         db = mysql.connect(
             host = "rouwens.ddns.net",
@@ -29,15 +81,32 @@ def start():
         for record in gebruiker:
             gebruikerstring = record
 
-        if gebruiker == []:
+        if gebruikerstring == []:
             print ("Gebruiker niet gevonden")
             time.sleep(2)
             start()
         
-        else:
-            print ("Gebruiker gevonden")
-        
-        print (gebruikerstring)
+        #else:
+            #tableSQL = """SHOW TABLES"""
+            #cursor.execute(tableSQL)
+            #table = cursor.fetchall()
+            #for record in table:
+                #tableout = record
+            
+            #tablestring = str(table)
+            #print (table)
+            #sqlusername = "'" + username + "'"
+            #tablefilter = tablestring.find(sqlusername)
+
+            #if tablefilter == username:
+                #print("Gebruikerstabel bestaat al")
+            
+            #else:
+                #print ("Table aangemaakt")
+                #CREATE TABLE `passwordmanager`.`test` ( `ID` INT(255) NOT NULL , `name` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL ) ENGINE = InnoDB;
+                #createtable = """CREATE TABLE `passwordmanager`.`%s` ( `ID` INT(255) NOT NULL , `name` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL ) ENGINE = InnoDB;"""
+                #usernameclean = re.sub(r'[^\w\s]', '', username)
+                #cursor.execute(createtable, (usernameclean,))
 
         # Haalt het gehashte wachtwoord uit de database en haalt alle interpuncties die er aan zitten weg. Zo is het een schone string.
         pwdSQL = """SELECT PASSWORD FROM `accounts` WHERE `username` = %s"""
@@ -68,12 +137,31 @@ def start():
         # Hier word gekeken van de net gemaakte hash overeenkomt met de hash in de database
         if pwd2check == hpwd:
             print ("De login gegevens zijn juist")
+            
+            #tableSQL = """SELECT added_table FROM `accounts` WHERE `username` = %s"""
+            #cursor.execute(tableSQL, (username,))
+            #tableFETCH = cursor.fetchall()
+            #strtableFETCH = str(tableFETCH)
+            #added_table = re.sub(r'[^\w\s]', '', strtableFETCH)
+            #usernamesqlsyntax = "'" + username + "'"
+
+            #if added_table == "0":
+                #print ("Table bestaat niet")
+                #createtable = """CREATE TABLE `passwordmanager`.`%s` ( `ID` INT(255) NOT NULL , `name` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL ) ENGINE = InnoDB;"""
+                #switch = """UPDATE `accounts` SET `added_table` = '1' WHERE `accounts`.`username` = %s;"""
+                #cursor.execute(createtable, (username,))
+                #cursor.execute(switch, (username,))
+
+            #else:
+                #print ("Table bestaat")
+            
         
         else:
             print ("De login gegevens zijn niet juist. Probeer het opnieuw...")
             time.sleep(2)
             inloggen()
-
+        
+        funcgebruiker (username)
 
 
 
