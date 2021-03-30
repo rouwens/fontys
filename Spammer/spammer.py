@@ -22,7 +22,7 @@ html = f.read()
 htmlstage = MIMEText(html, "html")
 message = str(htmlstage)
 
-receivers_mail = ['slachtoffer1@daanesmee.nl', 'daan@daanesmee.nl']
+receivers_mail = ['daan@daanesmee.nl', 'slachtoffer1@daanesmee.nl']
 to = ", ".join(receivers_mail)
 #to = ['slachtoffer1@daanesmee.nl', 'daan@daanesmee.nl']
 #to = ", ".join(recipients)
