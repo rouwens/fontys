@@ -9,8 +9,10 @@ def start ():
         client.publish("rouwens/stoplicht", kleur);
         client.disconnect();
         start()
-
-    print ("Type hier je kleur in. (rood,geel,groen)")
+    
+    print ()
+    print ("Type hier je kleur in. (rood,geel,groen) of uit")
+    print ("Vul stop in om het programma te stoppen")
     kleur = input()
 
     if kleur == "rood":
@@ -23,6 +25,14 @@ def start ():
     
     elif kleur == "groen":
         setkleur = "groen"
+        funcmqqt (setkleur)
+    
+    elif kleur == "uit":
+        setkleur = "uit"
+        funcmqqt (setkleur)
+
+    elif kleur == "stop":
+        exit ()
 
     else:
         print ("Kleur niet herkend...")

@@ -5,7 +5,12 @@ import string
 import mysql.connector as mysql
 import re
 import hashlib
+import base64
 
+
+# Ik gebruik functie in fuctie naar functie. Als tip heb ik moet ik return gaan gebruiken om terug te gaan.
+
+# Moet nog in een config bestand komen 
 
 db = mysql.connect(
     host = "rouwens.ddns.net",
@@ -25,6 +30,132 @@ cursor = db.cursor()
 
 def start():
 
+    def wachtwoorden(username):
+        username = username
+
+        print ()
+        print ("Wachtwoorden beheer")
+        print ()
+        print ("1 - lijst zien")
+        print ("2 - Toevoegen aan de lijst")
+        print ("3 - Veranderen aan de lijst")
+        print ("4 - Item verwijderen uit de lijst")
+        print ("")
+        print ("5 - Stoppen")
+        keuze = input()
+
+        if keuze == "1":
+            print()
+            show = """SELECT * FROM `%s`;"""
+            cursor.execute(show, (username,))
+
+            sql = cursor.fetchall()
+            print ("ID      Gebruikersnaam      Wachtwoord (gecrypt)     Omschrijving")  
+            for row in sql:
+                print(row, '\n')
+            input("Press Enter to continue...")
+            wachtwoorden(username)
+
+        
+        elif keuze == "2":
+            print ()
+            print ("Vul hier de titel in van het item.")
+            titel = input ()
+            print ()
+            print ("Wat is de gebruikersnaam?")
+            gebruikersnaam = input()
+            print ()
+            print ("Vul het wachtwoord in")
+            pwd1 = input()
+            print ()
+            print ("Vul het wachtwoord nog een keer in ter controle")
+            pwd2 = input()
+
+            if pwd1 == pwd2:
+                print ()
+            
+            else:
+                print ("Wachtwoorden kloppen niet. Probeer het opnieuw....")
+                time.sleep(2)
+                wachtwoorden(username)
+        
+            print ("Vul hier een omschrijving in van het item.")
+            omschrijving = input ()
+
+            str_pwd = pwd1
+            str_to_bytes = str_pwd.encode("ascii")
+            bytes_to_base64= base64.b64encode(str_to_bytes)
+            base64_output = bytes_to_base64.decode('ascii')
+
+            cursor.execute("INSERT INTO `%s` VALUES (NULL, %s, %s, %s, %s)", (username, titel, gebruikersnaam, base64_output, omschrijving))
+            db.commit()
+
+            print ("De gegevens zijn omgeslagen")
+            time.sleep(2)
+            wachtwoorden()
+    
+
+        elif keuze == ("3"):
+            print ()
+            print ("Wat is het ID van het item dat je wilt aanpassen?")
+            id = input()
+            print ()
+            print ("Wat wil je aanpassen? (naam/gebruikersnaam/wachtwoord/omschrijving)")
+            keuze = input()
+
+            if keuze == "naam":
+                print()
+
+            if keuze == "gebruikernsaam":
+                print ()
+                print ("Wat word de nieuwe gebruikersnaam?")
+                gebruikersnaam = input()
+                #UPDATE `'drouwens'` SET `username` = 'ps4gamer0409@gmail.com' WHERE `'drouwens'`.`ID` = 2;
+                cursor.execute("`%s` SET `username` = 'ps4gamer0409@gmail.com' WHERE `'drouwens'`.`ID` = 2;", (username, titel, gebruikersnaam, base64_output, omschrijving))
+                db.commit() 
+
+            
+            elif keuze == "wachtwoord":
+                print()
+            
+            elif keuze == "omschrijving":
+                print()
+            
+            else:
+                print ("Input niet herkend. Probeer het opnieuw...")
+                time.sleep(2)
+                wachtwoorden()
+        
+        elif keuze == ("4"):
+            print ()
+            print ("Vul het ID in van het item dat je wilt verwijderen.")
+            id = input()
+            print ()
+            print ("Weet je het zeker? (y/n)")
+            bevestiging = input()
+            if bevestiging == "y":
+                cursor.execute("DELETE FROM `%s` WHERE ID = %s ;", (username, id))
+                db.commit()
+                print ("Item is verwijderd...")
+                time.sleep(2)
+                wachtwoorden(username)
+            
+            else:
+                print ("De wijzegingen zijn niet aangebracht. De input klopt niet. Probeer het opnieuw....")
+                time.sleep(2)
+                wachtwoorden(username)
+        
+        elif keuze == ("5"):
+            exit()
+        
+        else:
+            print ("Keuze niet herkend...")
+            time.sleep(2)
+            wachtwoorden(username)
+
+
+
+   # Dit is de functie dat gaat over alle instellingen van de gebruiker.
     def instellingen(username):
         username = username
 
@@ -48,24 +179,32 @@ def start():
                 delvraag2 = input()
 
                 if delvraag2 == "VERWIJDER":
-                    dropdatabase = "DROP TABLE `passwordmanager`.`%s`;"
-                    cursor.execute(dropdatabase, (username,))
                     
-                    # Haal het ID van het account op
-                    fetchid = """SELECT ID FROM `accounts` WHERE `username` = %s"""
-                    cursor.execute(fetchid, (username,))
+                    state = """SELECT `added_table` FROM `accounts` WHERE `username` = %s"""
+                    cursor.execute(state, (username,))
                     sql = cursor.fetchall()
                     sqlstring = str(sql)
-                    id = re.sub(r'[^\w\s]', '', sqlstring)
+                    state = re.sub(r'[^\w\s]', '', sqlstring)
 
-                    onetonullsql = """UPDATE `accounts` SET `added_table` = '0' WHERE `accounts`.`ID` = %s;"""
-                    cursor.execute(onetonullsql, (id,))
+                    if state == "1":
+                    
+                        dropdatabase = "DROP TABLE `passwordmanager`.`%s`;"
+                        cursor.execute(dropdatabase, (username,))
+                        
+                        onetonullsql = """UPDATE `accounts` SET `added_table` = '0' WHERE `accounts`.`username` = %s;"""
+                        cursor.execute(onetonullsql, (username,))
+
+                        print ()
+                        print ("Database is verwijderd")
+                        time.sleep(2)
+                        funcgebruiker(username, db, cursor)
+                
+                    
+                    else:
+                        print ("Database bestaat niet. Dus valt er niks te verwijderen ;)")
+                        time.sleep(2)
+                        funcgebruiker(username,db,cursor)
                   
-                
-                    print ("Database is verwijderd")
-                    time.sleep(2)
-                    funcgebruiker(username, db, cursor)
-                
                 else:
                     print ("Input verkeerd. De database is niet verwijderd")
                     time.sleep(2)
@@ -133,7 +272,7 @@ def start():
         
         keuze = input()
         if keuze == "1":
-            print ("Keuze 1")
+            wachtwoorden(username)
         
         elif keuze == "2":
             instellingen(username)
@@ -142,7 +281,7 @@ def start():
             exit()
         
         elif keuze == "init":
-            switch = """UPDATE `accounts` SET `added_table` = '1' WHERE `accounts`.`username` = %s;"""
+            switch = """UPDATE `accounts` SET `added_table` = '0' WHERE `accounts`.`username` = %s;"""
             cursor.execute(switch, (username,))
             createtable = """CREATE TABLE `passwordmanager`.`%s` ( `ID` INT(255) NOT NULL , `name` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL ) ENGINE = InnoDB;"""
             cursor.execute(createtable, (username,))
@@ -168,10 +307,8 @@ def start():
         gebruikerSQL = """SELECT * FROM `accounts` WHERE `username` = %s"""
         cursor.execute(gebruikerSQL, (username,))
         gebruiker = cursor.fetchall()
-        for record in gebruiker:
-            gebruikerstring = record
 
-        if gebruikerstring == []:
+        if gebruiker == []:
             print ("Gebruiker niet gevonden")
             time.sleep(2)
             start()
@@ -203,7 +340,7 @@ def start():
         strspwd = str(pwdsalt).encode()
         hpwd = hashlib.sha256(strspwd).hexdigest()
 
-        # Hier word gekeken van de net gemaakte hash overeenkomt met de hash in de database
+        # Hier word gekeken van de net gemaakte hash overedenkomt met de hash in de database
         if pwd2check == hpwd:
             print ("De login gegevens zijn juist")
                     
@@ -213,7 +350,7 @@ def start():
             time.sleep(2)
             inloggen(db, cursor)
         
-        funcgebruiker (username, db, cursor)
+        funcgebruiker (username, db, cursor,)
 
 
 
@@ -226,6 +363,15 @@ def start():
         print ("Wat is de gebruikersnaam?")
         username = input()
         print ()
+        gebruikerSQL = """SELECT * FROM `accounts` WHERE `username` = %s"""
+        cursor.execute(gebruikerSQL, (username,))
+        gebruiker = cursor.fetchall()
+
+        if gebruiker != []:
+            print ("Gebruikersnaam bestaat al. Probeer het openieuw...")
+            time.sleep(2)
+            accountmaken(db, cursor)
+        
         print ("Wat is het wachtwoord dat je wilt gebruiken")
         password = input()
         print()
@@ -287,7 +433,7 @@ def start():
 
         addedtable = str(0)
 
-        cursor.execute("INSERT INTO accounts VALUES (NULL, %s, %s, %s, %s, %s)", (username, hpwd, salt, hint, addedtable))
+        cursor.execute("INSERT INTO accounts VALUES (NULL, %s, %s, %s, %s, %s, %s)", (username, hpwd, salt, hint, addedtable))
         db.commit()
         start()
     

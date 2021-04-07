@@ -1,42 +1,39 @@
-from cryptography.fernet import Fernet 
-import mysql.connector as mysql
+# open cmd and convert the text into strings.
+# https://superuser.com/questions/19992/is-it-possible-for-ipconfig-on-vista-to-display-the-status-of-one-adapter-only
 
-#print ("Type hier je geheim bericht")
-#secret = input()
+import subprocess
+import socket
 
-#key = Fernet.generate_key()
-#encryption_type = Fernet(key)
-#encrypted_message = encryption_type.encrypt(b"Hello World")
 
-#decryption_message = encryption_type.decrypt(encrypted_message)
-#print (key)
-#print (encrypted_message)
-#print ()
-#print (decryption_message)
+print ("What's the name of the interface?")
+interfaceinput = input()
 
-username = input()
+#print ("Is it an wireless or ethernet adapter?")
+#type = input()
 
-db = mysql.connect(
-    host = "rouwens.ddns.net",
-    user = "fontys",
-    passwd = "E6g2sAnv4FHBB4HB",
-    database = "passwordmanager"
-    )
-cursor = db.cursor()
+interface = '"' + interfaceinput + '"'
+cmd = "netsh interface ip show addresses " + interface
 
-tableSQL = """SELECT * FROM `'everstegen'`"""
-cursor.execute(tableSQL)
-table = cursor.fetchall()
-for record in table:
-    tableout = record
+process = subprocess.check_output(cmd ).decode('utf-8')
+text = str(process)
 
-#tablestring = str(tableout)
-#tabletofilter = tablestring.text
-#tablefilter = tablestring.find(username)
+# here you substract the ipv4 address from the text.
+device_ip = text.index("IP Address") +36 
+subnet_mask = text.index("Subnet Prefix")
+ip_address = text[device_ip:subnet_mask]
+print("Your device's IPv4 address:", ip_address)
 
-print (table)
-#if tablefilter == username:
- #   print("Gebruikerstabel bestaat al")
+# here you substract the subnet mask from the text.
+subnet_mask = text.index("mask") +5
+default_gate = text.index(")") 
+subnet = text[subnet_mask:default_gate]
+print("Your internet's Subnet Mask:", subnet)
 
-#else:
-#    print ("Table aangemaakt")                  
+socket.gethostbyname(socket.gethostname())
+
+
+#if type == "wireless":
+ #   cmd = "wmic nicconfig where 'description like '%wireless%' get caption, defaultipgateway"
+ #   process = subprocess.check_output(cmd).decode('utf-8')
+ #   text = str(process)
+ #   print (cmd)
