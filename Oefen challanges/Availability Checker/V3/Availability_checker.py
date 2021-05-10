@@ -51,7 +51,7 @@ def start():
     def resultaat():
             
         db = mysql.connect(
-            host = "192.168.178.254",
+            host = "rouwens.ddns.net",
             user = "fontys",
             passwd = "E6g2sAnv4FHBB4HB",
             database = "availability-checker"

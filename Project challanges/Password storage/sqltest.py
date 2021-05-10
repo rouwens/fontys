@@ -14,10 +14,12 @@ db = mysql.connect(
     database = "passwordmanager"
     )
 cursor = db.cursor()
-username = "drouwens"
-inhoud = "drouwens@gmail.com"
-id = "2"
-switch = """UPDATE %s SET username = %s WHERE %s.ID = %s;"""
-cursor.execute(switch, (username, inhoud, username, id,))
 
+item = "9"
 
+getuserid = """SELECT userid FROM `wachtwoorden` WHERE `ID` = %s"""
+cursor.execute(getuserid, (item, ))
+fetch = cursor.fetchall()
+clean = str(fetch)
+id = re.sub(r'[^\w\s]', '', clean)
+print (id)

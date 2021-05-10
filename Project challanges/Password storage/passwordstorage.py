@@ -30,8 +30,9 @@ cursor = db.cursor()
 
 def start():
 
-    def wachtwoorden(username):
+    def wachtwoorden(username, ID):
         username = username
+        ID = ID
 
         print ()
         print ("Wachtwoorden beheer")
@@ -41,29 +42,47 @@ def start():
         print ("3 - Toevoegen aan de lijst")
         print ("4 - Veranderen aan de lijst")
         print ("5 - Item verwijderen uit de lijst")
+        print ("6 - Wachtwoord genereren")
         print ("")
-        print ("6 - Stoppen")
+        print ("7 - Stoppen")
         keuze = input()
 
+        # Items uitlezen
         if keuze == "1":
             print()
-            show = """SELECT * FROM `%s`;"""
-            cursor.execute(show, (username,))
+            show = """SELECT * FROM `wachtwoorden` WHERE `userid` = %s;"""
+            cursor.execute(show, (ID,))
 
             sql = cursor.fetchall()
-            print ("ID      Gebruikersnaam      Wachtwoord (gecrypt)     Omschrijving")  
+            print ("ItemID      GebruikersID      Gebruikersnaam      Wachtwoord (gecrypt)     Omschrijving")  
             for row in sql:
                 print(row, '\n')
             input("Druk op enter om verder te gaan...")
 
+        # Wachtwoord van een item ophalen en laten zien
         elif keuze =="2":
             print ()
             print ("Vul hierin het ID waarvan je het wachtwoord wilt zien.")
             id = input() 
+            strid = str(id)
+
+            getuserid = """SELECT userid FROM `wachtwoorden` WHERE `ID` = %s"""
+            cursor.execute(getuserid, (id, ))
+            fetch = cursor.fetchall()
+            clean = str(fetch)
+            userid = re.sub(r'[^\w\s]', '', clean)
+
+            if userid == ID:
+                print()
+            
+            else:
+                print("Je hebt geen toegang tot dit item. Geef een item op die wel van je is.")
+                time.sleep(2)
+                wachtwoorden(username, ID)
 
             # Ophalen van het wachtwoord uit de database
-            getpwd = """SELECT password FROM `%s` WHERE `ID` = %s"""
-            cursor.execute(getpwd, (username, id,))
+            getpwd = """SELECT password FROM `wachtwoorden` WHERE `ID` = %s"""
+            cursor.execute(getpwd, (id,))
             fetch = cursor.fetchall()
             clean = str(fetch)
             pwd = clean[3:-4]
@@ -77,9 +96,9 @@ def start():
             print ()
             print ("Het wachtwoord bij ID " + id + " is " + decode_str)
             time.sleep(2)
-            wachtwoorden(username)
+            wachtwoorden(username, ID)
 
-        
+        # Item aan de database toevoegen
         elif keuze == "3":
             print ()
             print ("Vul hier de titel in van het item.")
@@ -105,15 +124,17 @@ def start():
             print ("Vul hier een omschrijving in van het item.")
             omschrijving = input ()
 
+            # Het wachtwoord encoden met base64
+
             str_pwd = pwd1
             str_to_bytes = str_pwd.encode("ascii")
             bytes_to_base64= base64.b64encode(str_to_bytes)
             base64_output = bytes_to_base64.decode('ascii')
 
-            cursor.execute("INSERT INTO `%s` VALUES (NULL, %s, %s, %s, %s)", (username, titel, gebruikersnaam, base64_output, omschrijving))
+            cursor.execute("INSERT INTO `wachtwoorden` VALUES (NULL, %s, %s, %s, %s, %s)", (ID, titel, gebruikersnaam, base64_output, omschrijving))
             db.commit()
 
-            print ("De gegevens zijn omgeslagen")
+            print ("De gegevens zijn opgeslagen")
             time.sleep(2)    
 
         elif keuze == ("4"):
@@ -124,28 +145,30 @@ def start():
             print ("Wat wil je aanpassen? (naam/gebruikersnaam/wachtwoord/omschrijving)")
             keuze = input()
 
+            # Naam van een item veranderern
             if keuze == "naam":
                 print ()
                 print ("Wat word de nieuwe naam van het item?")
                 name = input()
-                cursor.execute("UPDATE `%s` SET `name` = %s WHERE `%s`.`ID` = %s;", (username, name, username, id))
+                cursor.execute("UPDATE wachtwoorden SET name = %s WHERE id = %s;", (name, id,))
                 db.commit()
                 print()
                 print ("Naam is aangepast")
                 time.sleep(2)
                 wachtwoorden(username)
 
+            # Gebruikersnaam van een item veranderen
             if keuze == "gebruikersnaam":
                 print ()
                 print ("Wat word de nieuwe gebruikersnaam?")
                 gebruikersnaam = input()
-                cursor.execute("UPDATE `%s` SET `username` = %s WHERE `%s`.`ID` = %s;", (username, gebruikersnaam, username, id))
+                cursor.execute("UPDATE wachtwoorden SET username = %s WHERE id = %s;", (gebruikersnaam, id))
                 db.commit()
                 print ()
                 print ("Gebruikernaam is aangepast")
                 time.sleep(2) 
 
-            
+            # Wachtwoord van een item veranderen
             elif keuze == "wachtwoord":
                 print ()
                 print ("Vul hier het nieuwe wachtwoord in")
@@ -161,7 +184,7 @@ def start():
                     bytes_to_base64= base64.b64encode(str_to_bytes)
                     base64_output = bytes_to_base64.decode('ascii')
 
-                    cursor.execute("UPDATE `%s` SET `password` = %s WHERE `%s`.`ID` = %s;", (username, base64_output, username, id))
+                    cursor.execute("UPDATE wachtwoorden SET password = %s WHERE id = %s;", (base64_output, id))
                     db.commit()
                     print ()
                     print ("Het wachtwoord is bijgewerkt")
@@ -173,13 +196,14 @@ def start():
                     print ("Wachtwoorden komen niet overeen")
                     time.sleep(2)
                 
-                wachtwoorden(username)
+                wachtwoorden(username, ID)
             
+            # Omschrijving van een item veranderen
             elif keuze == "omschrijving":
                 print ()
                 print ("Wat word de nieuwe omschrijving?")
                 omschrijving = input()
-                cursor.execute("UPDATE `%s` SET `sum` = %s WHERE `%s`.`ID` = %s;", (username, omschrijving, username, id))
+                cursor.execute("UPDATE wachtwoorden SET omschrijving = %s WHERE id = %s;", (omschrijving, id))
                 db.commit()
                 print ()
                 print ("Omschrijving is aangepast")
@@ -189,8 +213,9 @@ def start():
                 print ("Input niet herkend. Probeer het opnieuw...")
                 time.sleep(2)
             
-            wachtwoorden(username)
+            wachtwoorden(username, ID)
         
+        # Item uit de database verwijderen
         elif keuze == ("5"):
             print ()
             print ("Vul het ID in van het item dat je wilt verwijderen.")
@@ -199,38 +224,87 @@ def start():
             print ("Weet je het zeker? (y/n)")
             bevestiging = input()
             if bevestiging == "y":
-                cursor.execute("DELETE FROM `%s` WHERE ID = %s ;", (username, id))
+                cursor.execute("DELETE FROM wachtwoorden WHERE id = %s ;", (id))
                 db.commit()
                 print ("Item is verwijderd...")
                 time.sleep(2)
-                wachtwoorden(username)
+                wachtwoorden(username, ID)
             
             else:
                 print ("De wijzegingen zijn niet aangebracht. De input klopt niet. Probeer het opnieuw....")
                 time.sleep(2)
-                wachtwoorden(username)
+                wachtwoorden(username, ID)
         
+        # Wachtwoord genereren
         elif keuze == ("6"):
+            print()
+            print ("Uit hoeveel karakters moet het wachtwoord bestaan?")
+            lengte = input()
+            print ()
+            print ("Wil je gebruik maken van hoofdletters?")
+            hoofd = input()
+            print()
+            print ("Wil je gebruik maken van kleine letters?")
+            klein = input()
+            print()
+            print ("Wil je gebruik maken van leestekens?")
+            lees = input()
+            print ()
+            print ("Wil je gebruik maken van cijfers?")
+            cijfer = input()
+
+            if hoofd == ("y"):
+                hoofdletters = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+            else:
+                hoofdletters = ""
+            
+            if klein == ("y"):
+                kleineletters = "abcdefghijklmnopqrstuvwxyz"
+            else:
+                kleineletters = ""
+            
+            if lees == ("y"):
+                leestekens = "!@#$%*()-=[]/.,<>?:}+_"
+            else:
+                leestekens = ""
+            
+            if cijfer == ("y"):
+                cijfers = ("1234567890")
+            else:
+                cijfers = ""
+            
+            intlengte = int(lengte)
+            randomstring = hoofdletters + kleineletters + leestekens + cijfers
+            wachtwoord = ''.join((random.choice(randomstring) for i in range(intlengte)))
+            print ()
+            print ("Het gegenereerde wachtwoord is: " + wachtwoord)
+
+        # Stoppen
+        elif keuze == ("7"):
             exit()
         
         else:
             print ("Keuze niet herkend...")
             time.sleep(2)
-            wachtwoorden(username)
+            wachtwoorden(username,ID)
+        
+        wachtwoorden(username, ID)
 
 
 
    # Dit is de functie dat gaat over alle instellingen van de gebruiker.
-    def instellingen(username):
+    def instellingen(username, ID):
         username = username
+        ID = ID
 
         print()
         print ("Instellingen")
         print ("")
         print ("1 - Database droppen")
         print ("2 - Account verwijderen")
+        print ("3 - Wachtwoord wijzigen")
         print ("")
-        print ("3 - Terug")
+        print ("4 - Terug")
         print ("")
         keuze = input()
 
@@ -240,40 +314,21 @@ def start():
         
             if delvraag1 == "y":
                 print ()
-                print ("Type VERWIJDER in om de database definitief te verwijderen")
+                print ("Type VERWIJDER in om alle gegevens wachtwoorden definitief te verwijderen")
                 delvraag2 = input()
 
                 if delvraag2 == "VERWIJDER":
-                    
-                    state = """SELECT `added_table` FROM `accounts` WHERE `username` = %s"""
-                    cursor.execute(state, (username,))
-                    sql = cursor.fetchall()
-                    sqlstring = str(sql)
-                    state = re.sub(r'[^\w\s]', '', sqlstring)
-
-                    if state == "1":
-                    
-                        dropdatabase = "DROP TABLE `passwordmanager`.`%s`;"
-                        cursor.execute(dropdatabase, (username,))
-                        
-                        onetonullsql = """UPDATE `accounts` SET `added_table` = '0' WHERE `accounts`.`username` = %s;"""
-                        cursor.execute(onetonullsql, (username,))
-
-                        print ()
-                        print ("Database is verwijderd")
-                        time.sleep(2)
-                        funcgebruiker(username, db, cursor)
-                
-                    
-                    else:
-                        print ("Database bestaat niet. Dus valt er niks te verwijderen ;)")
-                        time.sleep(2)
-                        funcgebruiker(username,db,cursor)
-                  
+                    #DELETE FROM wachtwoorden WHERE userid = 3
+                    cursor.execute("DELETE FROM wachtwoorden WHERE userid = %s ;", (ID,))
+                    db.commit()
+                    print ("Alle wachtwoorden zijn verwijderd.")
+                    time.sleep(2)
+                    instellingen(username, ID)
+                                      
                 else:
                     print ("Input verkeerd. De database is niet verwijderd")
                     time.sleep(2)
-                    instellingen(username)
+                    instellingen(username, ID)
                            
 
         elif keuze == "2":
@@ -303,6 +358,63 @@ def start():
                     start ()
 
         elif keuze == "3":
+            print()
+            print ("Vul hier je huidige wachtwoord in")
+            huidig_pwd = input()
+
+            # Haalt het gehashte wachtwoord uit de database en haalt alle interpuncties die er aan zitten weg. Zo is het een schone string.
+            pwdSQL = """SELECT PASSWORD FROM `accounts` WHERE `username` = %s"""
+            cursor.execute(pwdSQL, (username,))
+            pwdFETCH = cursor.fetchall()
+            strpwdFETCH = str(pwdFETCH)
+            pwd2check = re.sub(r'[^\w\s]', '', strpwdFETCH) 
+
+            # Haalt de salt uit de database en haalt alle interpuncties die er aan zitten weg. Zo is het een schone string
+
+            saltSQL = """SELECT SALT FROM `accounts` WHERE `username` = %s"""
+            cursor.execute(saltSQL, (username,))
+            saltFETCH = cursor.fetchall()
+            strsaltFETCH = str(saltFETCH)
+
+            salt = re.sub(r'[^\w\s]', '', strsaltFETCH)
+
+            pwdsalt = huidig_pwd + salt
+            strspwd = str(pwdsalt).encode()
+            hpwd = hashlib.sha256(strspwd).hexdigest()
+
+            if pwd2check == hpwd:
+                print ("Wat word het nieuwe wachtwoord?")
+                pwd = input()
+                password_checker(pwd)
+
+                print ("Vul het wachtwoord nog een keer in ter controle")
+                pwd1 = input()
+
+                if pwd == pwd1:
+                    print ()
+
+                else:
+                    print ("Wachtwoorden komen niet overeen. Probeer het opnieuw...")
+                    time.sleep(2)
+                    instellingen(username, ID)
+                
+                # Hier word een salt gegenereerd en gelijk daarna gehasht met het wachtwoord.
+                tekens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+                salt = ''.join((random.choice(tekens) for i in range(10)))
+                spwd = pwd + salt
+                strspwd = str(spwd).encode()
+                hpwd = hashlib.sha256(strspwd).hexdigest()
+
+
+            else:
+                print ()
+                print ("Het wachtwoord is onjuist. Probeer het opnieuw....")
+                time.sleep(2)
+            
+            wachtwoorden(username)
+
+
+        elif keuze == "4":
             funcgebruiker(username, db, cursor)
         
         else:
@@ -314,17 +426,18 @@ def start():
         username = username
         db = db
         cursor = cursor
+        print (username)
 
         cursor = db.cursor()
 
-        tableSQL = """SELECT added_table FROM `accounts` WHERE `username` = %s"""
+        tableSQL = """SELECT ID FROM `accounts` WHERE `username` = %s"""
         cursor.execute(tableSQL, (username,))
         tableFETCH = cursor.fetchall()
         strtableFETCH = str(tableFETCH)
-        added_table = re.sub(r'[^\w\s]', '', strtableFETCH)
+        ID = re.sub(r'[^\w\s]', '', strtableFETCH)
         
         print()
-        print ("Ingelogd als gebruiker " + username)
+        print ("Ingelogd als gebruiker " + username + "Gebruikers ID is " + ID)
         print ("")
         print ("1 - Naar wachtwoorden gaan")
         print ("2 - Instellingen")
@@ -332,33 +445,17 @@ def start():
         print ("3 - stoppen")
         print ("")
         
-        if added_table == "0":
-            print ("Database bestaat nog niet type init om het aan te maken")
         
         keuze = input()
         if keuze == "1":
-            wachtwoorden(username)
+            wachtwoorden(username, ID)
         
         elif keuze == "2":
-            instellingen(username)
+            instellingen(username, ID)
         
         elif keuze == "3":
             exit()
         
-        elif keuze == "init":
-            cursor.execute("CREATE TABLE `passwordmanager`.`%s` ( `ID` INT(255) NOT NULL , `name` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL ) ENGINE = InnoDB", (username,))
-            db.commit()
-            cursor.execute("UPDATE `accounts` SET `added_table` = '0' WHERE `accounts`.`username` = %s;", (username,))
-            db.commit()
-            #switch = """UPDATE `accounts` SET `added_table` = '0' WHERE `accounts`.`username` = %s;"""
-            #cursor.execute(switch, (username,))
-            #createtable = """CREATE TABLE `passwordmanager`.`%s` ( `ID` INT(255) NOT NULL , `name` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL ) ENGINE = InnoDB;"""
-            #cursor.execute(createtable, (username,))
-            print ()
-            print ("Database aangemaakt")
-            time.sleep(2)
-            funcgebruiker (username, db, cursor)
-
 
     # Dit is het login scherm
     def inloggen(db, cursor):
@@ -500,9 +597,7 @@ def start():
         strspwd = str(spwd).encode()
         hpwd = hashlib.sha256(strspwd).hexdigest()
 
-        addedtable = str(0)
-
-        cursor.execute("INSERT INTO accounts VALUES (NULL, %s, %s, %s, %s, %s, %s)", (username, hpwd, salt, hint, addedtable))
+        cursor.execute("INSERT INTO accounts VALUES (NULL, %s, %s, %s, %s)", (username, hpwd, salt, hint))
         db.commit()
         start()
     
@@ -558,7 +653,7 @@ def start():
                 print ("Probeer het opnieuw...")
                 print ()
                 time.sleep (2)
-                accountmaken(db, cursor)
+                #accountmaken(db, cursor)
 
           
 
