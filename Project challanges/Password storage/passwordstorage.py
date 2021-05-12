@@ -135,6 +135,7 @@ def start():
             cursor.execute("INSERT INTO `wachtwoorden` VALUES (NULL, %s, %s, %s, %s, %s)", (ID, titel, gebruikersnaam, base64_output, omschrijving))
             db.commit()
 
+            print ()
             print ("De gegevens zijn opgeslagen")
             time.sleep(2)
 
@@ -241,34 +242,34 @@ def start():
             print ("Uit hoeveel karakters moet het wachtwoord bestaan?")
             lengte = input()
             print ()
-            print ("Wil je gebruik maken van hoofdletters?")
+            print ("Wil je gebruik maken van hoofdletters? (j/n")
             hoofd = input()
             print()
-            print ("Wil je gebruik maken van kleine letters?")
+            print ("Wil je gebruik maken van kleine letters? (j/n")
             klein = input()
             print()
-            print ("Wil je gebruik maken van leestekens?")
+            print ("Wil je gebruik maken van leestekens? (j/n")
             lees = input()
             print ()
-            print ("Wil je gebruik maken van cijfers?")
+            print ("Wil je gebruik maken van cijfers? (j/n)")
             cijfer = input()
 
-            if hoofd == ("y"):
+            if hoofd == ("j"):
                 hoofdletters = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
             else:
                 hoofdletters = ""
 
-            if klein == ("y"):
+            if klein == ("j"):
                 kleineletters = "abcdefghijklmnopqrstuvwxyz"
             else:
                 kleineletters = ""
 
-            if lees == ("y"):
+            if lees == ("j"):
                 leestekens = "!@#$%*()-=[]/.,<>?:}+_"
             else:
                 leestekens = ""
 
-            if cijfer == ("y"):
+            if cijfer == ("j"):
                 cijfers = ("1234567890")
             else:
                 cijfers = ""
@@ -312,10 +313,10 @@ def start():
         keuze = input()
 
         if keuze == "1":
-            print ("Weet je het zeker? Er is geen mogelijkheid om je gegevens later te herstellen. (y/n)")
+            print ("Weet je het zeker? Er is geen mogelijkheid om je gegevens later te herstellen. (j/n)")
             delvraag1 = input()
 
-            if delvraag1 == "y":
+            if delvraag1 == "j":
                 print ()
                 print ("Type VERWIJDER in om alle gegevens wachtwoorden definitief te verwijderen")
                 delvraag2 = input()
@@ -323,6 +324,7 @@ def start():
                 if delvraag2 == "VERWIJDER":
                     cursor.execute("DELETE FROM wachtwoorden WHERE userid = %s ;", (ID,))
                     db.commit()
+                    print ()
                     print ("Alle wachtwoorden zijn verwijderd.")
                     time.sleep(2)
                     instellingen(username, ID)
@@ -334,10 +336,10 @@ def start():
 
 
         elif keuze == "2":
-            print ("Weet je het zeker? Er is geen mogelijkheid om je gegevens later te herstellen. (y/n)")
+            print ("Weet je het zeker? Er is geen mogelijkheid om je gegevens later te herstellen. (j/n)")
             delvraag1 = input()
 
-            if delvraag1 == "y":
+            if delvraag1 == "j":
                 print ()
                 print ("Type VERWIJDER in om je account definitief te verwijderen")
                 delvraag2 = input()
@@ -406,6 +408,9 @@ def start():
                 cursor.execute("UPDATE accounts SET password = %s WHERE ID = %s;", (hpwd, ID))
                 db.commit()   
 
+                print ()
+                print ("Het wachtwoord is gewijzigd")
+                time.sleep(2)
 
             else:
                 print ()
@@ -516,6 +521,7 @@ def start():
         gebruiker = cursor.fetchall()
 
         if gebruiker == []:
+            print ()
             print ("Gebruiker niet gevonden")
             time.sleep(2)
             start()
@@ -740,6 +746,7 @@ def start():
         print ()
         print ("Wat word het nieuwe wachtwoord?")
         pwd = input()
+        password_checker (pwd)
         print ()
         print ("Vul hier nog een keer het wachtwoord ter bevesteging")
         pwd2 = input()
@@ -749,7 +756,7 @@ def start():
             print ("De nieuwe wachtwoorden komen niet met elkaar overeen. Probeer het opnieuw...")
             wachtwoordresetten(db, cursor)
 
-        password_checker (pwd)
+      
 
         # Hier word een nieuwe salt en hash gegenereerd
         tekens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
