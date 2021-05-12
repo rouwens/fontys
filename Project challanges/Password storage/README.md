@@ -5,6 +5,8 @@ Voor dit project heb ik de volgende modules gebruikt
  - re
  - hashlib
  - base64
+ - os
+ - requests
  - mysql.connector
  - requests
 
