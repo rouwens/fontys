@@ -44,7 +44,8 @@ def start():
         print ("5 - Item verwijderen uit de lijst")
         print ("6 - Wachtwoord genereren")
         print ("")
-        print ("7 - Stoppen")
+        print ("7 - Terug")
+        print ("8 - Stoppen")
         keuze = input()
 
         # Items uitlezen
@@ -190,7 +191,6 @@ def start():
                     print ("Het wachtwoord is bijgewerkt")
                     time.sleep(2)
 
-
                 else:
                     print ()
                     print ("Wachtwoorden komen niet overeen")
@@ -279,8 +279,10 @@ def start():
             print ()
             print ("Het gegenereerde wachtwoord is: " + wachtwoord)
 
+        elif keuze == "7":
+            funcgebruiker(username, db, cursor)
         # Stoppen
-        elif keuze == ("7"):
+        elif keuze == ("8"):
             exit()
 
         else:
@@ -303,10 +305,9 @@ def start():
         print ("1 - Alle wachtwoorden verwijderen")
         print ("2 - Account verwijderen")
         print ("3 - Wachtwoord wijzigen")
-        print ("4 - Herstelsleutel ophalen")
-        print ("5 - Herstelsleutel vernieuwen")
+        print ("4 - Herstelsleutel vernieuwen")
         print ("")
-        print ("6 - Terug")
+        print ("5 - Terug")
         print ("")
         keuze = input()
 
@@ -378,17 +379,16 @@ def start():
             hpwd = hashlib.sha256(strspwd).hexdigest()
 
             if pwd2check == hpwd:
+                print()
                 print ("Wat word het nieuwe wachtwoord?")
                 pwd = input()
                 password_checker(pwd)
 
+                print ()
                 print ("Vul het wachtwoord nog een keer in ter controle")
                 pwd1 = input()
 
-                if pwd == pwd1:
-                    print ()
-
-                else:
+                if pwd != pwd1:
                     print ("Wachtwoorden komen niet overeen. Probeer het opnieuw...")
                     time.sleep(2)
                     instellingen(username, ID)
@@ -400,27 +400,70 @@ def start():
                 strspwd = str(spwd).encode()
                 hpwd = hashlib.sha256(strspwd).hexdigest()
 
+                cursor.execute("UPDATE accounts SET salt = %s WHERE id = %s;", (salt, ID))
+                db.commit()
+
+                cursor.execute("UPDATE accounts SET password = %s WHERE ID = %s;", (hpwd, ID))
+                db.commit()   
+
 
             else:
                 print ()
                 print ("Het wachtwoord is onjuist. Probeer het opnieuw....")
                 time.sleep(2)
 
-            wachtwoorden(username)
+            wachtwoorden(username, ID)
 
         elif keuze == "4":
             print ()
+            print ("Vul hier je wachtwoord in om de herstelsleutel te vernieuwen")
+            pwd = input()
+            
+            # Haalt het gehashte wachtwoord uit de database en haalt alle interpuncties die er aan zitten weg. Zo is het een schone string.
+            pwdSQL = """SELECT PASSWORD FROM `accounts` WHERE `username` = %s"""
+            cursor.execute(pwdSQL, (username,))
+            pwdFETCH = cursor.fetchall()
+            strpwdFETCH = str(pwdFETCH)
+            pwd2check = re.sub(r'[^\w\s]', '', strpwdFETCH)
+
+            # Haalt de salt uit de database en haalt alle interpuncties die er aan zitten weg. Zo is het een schone string
+            saltSQL = """SELECT SALT FROM `accounts` WHERE `username` = %s"""
+            cursor.execute(saltSQL, (username,))
+            saltFETCH = cursor.fetchall()
+            strsaltFETCH = str(saltFETCH)
+            salt = re.sub(r'[^\w\s]', '', strsaltFETCH)
+
+            pwdsalt = pwd + salt
+            strspwd = str(pwdsalt).encode()
+            hpwd = hashlib.sha256(strspwd).hexdigest()
+
+            if hpwd != pwd2check:
+                print ("Het wachtwoord klopt niet. Probeer het opnieuw...")
+                time.sleep(2)
+                instellingen(username)
+
+            tekens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+            recoverykey = ''.join((random.choice(tekens) for i in range(10)))
+            strrk = str(recoverykey).encode()
+            hrk = hashlib.sha256(strrk).hexdigest()
+
+            cursor.execute("UPDATE accounts SET recoverykey = %s WHERE id = %s;", (hrk, ID))
+            db.commit()
+
+            print ()
+            print ("De herstelsleutel is verniewd. De nieuwe herstelsleutel is: " + recoverykey)
+            print ("Bewaar deze goed!")
+            print()
+            time.sleep(2)
+            instellingen(username, ID)
 
         elif keuze == "5":
-            print ()
-
-        elif keuze == "6":
             funcgebruiker(username, db, cursor)
 
         else:
             print ("Keuze niet herkend. Probeer het opnieuw...")
             time.sleep(2)
-            instellingen(username)
+            instellingen(username, ID)
 
     def funcgebruiker (username, db, cursor):
         username = username
@@ -597,7 +640,7 @@ def start():
 
         recoverykey = ''.join((random.choice(tekens) for i in range(10)))
         strrk = str(recoverykey).encode()
-        hrk = hashlib.sha256(strspwd).hexdigest()
+        hrk = hashlib.sha256(strrk).hexdigest()
 
         cursor.execute("INSERT INTO accounts VALUES (NULL, %s, %s, %s, %s, %s)", (username, hpwd, salt, hint, hrk))
         db.commit()
@@ -651,6 +694,7 @@ def start():
                 accountmaken(db, cursor)
 
             elif any(str in leestekentest for str in pwd):
+                print ()
                 print("Het wachtwoord voldoet aan alle eisen.")
                 print ()
 
@@ -660,7 +704,7 @@ def start():
                 print ()
                 time.sleep (2)
 
-    def wachtwoordresetten():
+    def wachtwoordresetten(db, cursor):
         print ()
         print ("Wat is je gebruikersnaam?")
         username = input()
@@ -670,7 +714,7 @@ def start():
         cursor.execute(gebruikerSQL, (username,))
         gebruiker = cursor.fetchall()
 
-        if gebruiker != []:
+        if gebruiker == []:
             print ("Gebruikersnaam bestaat niet. Probeer het openieuw...")
             time.sleep(2)
             wachtwoordresetten(db, cursor)
@@ -678,16 +722,68 @@ def start():
         print ("Wat is je herstelsleutel?")
         key = input()
 
-        if key == fetchkey:
-            print()
+        strrk = str(key).encode()
+        hrk = hashlib.sha256(strrk).hexdigest()
 
+        rkSQL = """SELECT recoverykey FROM accounts WHERE username = %s"""
+        cursor.execute(rkSQL, (username,))
+        rkFETCH = cursor.fetchall()
+        strrkFETCH = str(rkFETCH)
+        rk2check = re.sub(r'[^\w\s]', '', strrkFETCH)
+
+        if hrk != rk2check:
+            print ()
+            print ("De herstelsleutel klopt niet. Probeer het opnieuw...")
+            time.sleep(2)
+            wachtwoordresetten(db, cursor)
+
+        print ()
+        print ("Wat word het nieuwe wachtwoord?")
+        pwd = input()
+        print ()
+        print ("Vul hier nog een keer het wachtwoord ter bevesteging")
+        pwd2 = input()
+
+        if pwd != pwd2:
+            print ()
+            print ("De nieuwe wachtwoorden komen niet met elkaar overeen. Probeer het opnieuw...")
+            wachtwoordresetten(db, cursor)
+
+        password_checker (pwd)
+
+        # Hier word een nieuwe salt en hash gegenereerd
+        tekens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+        salt = ''.join((random.choice(tekens) for i in range(10)))
+        spwd = pwd + salt
+        strspwd = str(spwd).encode()
+        hpwd = hashlib.sha256(strspwd).hexdigest()
+
+        # Het ophalen van he ID van de gebruiker
+        tableSQL = """SELECT ID FROM `accounts` WHERE `username` = %s"""
+        cursor.execute(tableSQL, (username,))
+        tableFETCH = cursor.fetchall()
+        strtableFETCH = str(tableFETCH)
+        ID = re.sub(r'[^\w\s]', '', strtableFETCH)
+
+        cursor.execute("UPDATE accounts SET salt = %s WHERE id = %s;", (salt, ID))
+        db.commit()
+
+        cursor.execute("UPDATE accounts SET password = %s WHERE ID = %s;", (hpwd, ID))
+        db.commit()       
+        
+        print ()
+        print ("Het wachtwoord is gewijzigd")
+        time.sleep(2)
+        start()
+        
+    print ()
     print ("Password storage")
     print ()
     print ("1 - Inloggen")
     print ("2 - Account maken")
     print ("3 - Wachtwoord resetten")
     print ()
-    print ("4  - stoppen")
+    print ("4  - Stoppen")
     print ()
     keuze = input()
 

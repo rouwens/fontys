@@ -1,5 +1,6 @@
 import random
 import time
+#from mysql.connector.errors import custom_error_exception
 import requests
 import string
 import mysql.connector as mysql
@@ -15,11 +16,8 @@ db = mysql.connect(
     )
 cursor = db.cursor()
 
-item = "9"
+salt = "Gekke"
+userid = "16"
 
-getuserid = """SELECT userid FROM `wachtwoorden` WHERE `ID` = %s"""
-cursor.execute(getuserid, (item, ))
-fetch = cursor.fetchall()
-clean = str(fetch)
-id = re.sub(r'[^\w\s]', '', clean)
-print (id)
+cursor.execute("UPDATE accounts SET salt = %s WHERE id = %s;", (salt, userid))
+db.commit()
