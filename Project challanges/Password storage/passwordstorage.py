@@ -157,7 +157,6 @@ def start():
                 print()
                 print ("Naam is aangepast")
                 time.sleep(2)
-                wachtwoorden(username)
 
             # Gebruikersnaam van een item veranderen
             if keuze == "gebruikersnaam":
@@ -336,6 +335,7 @@ def start():
 
 
         elif keuze == "2":
+            print ()
             print ("Weet je het zeker? Er is geen mogelijkheid om je gegevens later te herstellen. (j/n)")
             delvraag1 = input()
 
