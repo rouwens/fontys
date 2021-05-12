@@ -6,6 +6,8 @@ import mysql.connector as mysql
 import re
 import hashlib
 import base64
+import platform
+import os
 
 db = mysql.connect(
     host = "rouwens.ddns.net",
@@ -15,11 +17,7 @@ db = mysql.connect(
     )
 cursor = db.cursor()
 
-id = "8"
-fetchid = """SELECT ID FROM `wachtwoorden` WHERE `userid` = %s"""
-cursor.execute(fetchid, (id,))
-sql = cursor.fetchall()
-sqlstring = str(sql)
-id = re.sub(r'[^\w\s]', '', sqlstring)
+cmd = "echo 3 | ping -c 1 rouwens.ddns.net >/dev/null 2>&1"
 
-print (sqlstring)
+check = os.system(cmd)
+print(check)

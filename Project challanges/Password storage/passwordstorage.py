@@ -6,26 +6,19 @@ import mysql.connector as mysql
 import re
 import hashlib
 import base64
+import platform
+import os
+import configparser
 
-
-# Ik gebruik functie in fuctie naar functie. Als tip heb ik moet ik return gaan gebruiken om terug te gaan.
-
-# Moet nog in een config bestand komen
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 db = mysql.connect(
-    host = "rouwens.ddns.net",
-    user = "fontys",
-    passwd = "E6g2sAnv4FHBB4HB",
-    database = "passwordmanager"
+    host = config['database']['url'],
+    user = config['database']['user'],
+    passwd = config['database']['pwd'],
+    database = config['database']['database'],
     )
-
-#db = mysql.connect(
-    #host = "192.168.178.200",
-    #user = "daan",
-    #passwd = "welkom01",
-    #database = "passwordmanager"
-    #)
-
 cursor = db.cursor()
 
 def start():
@@ -804,5 +797,17 @@ def start():
     elif keuze == "4":
         exit()
 
+# Checken of de database bereikbaar is (werkt alleen op Linux en Freebsd)
+system = platform.system()
+
+if system == "Linux" or "FreeBSD":
+    print()
+    cmd = "echo 3 | ping -c 1 rouwens.ddns.net >/dev/null 2>&1"
+    check = os.system(cmd)
+
+    if check != 0:
+        print ("Het programma kan de server niet bereiken controlleer je verbinding...")
+        time.sleep(2)
+        exit()    
 
 start()
