@@ -79,7 +79,7 @@ def start():
             else:
                 print("Je hebt geen toegang tot dit item. Geef een item op die wel van je is.")
                 time.sleep(2)
-                wachtwoorden(username, ID)
+                return wachtwoorden(username, ID)
 
             # Ophalen van het wachtwoord uit de database
             getpwd = """SELECT password FROM `wachtwoorden` WHERE `ID` = %s"""
@@ -97,7 +97,7 @@ def start():
             print ()
             print ("Het wachtwoord bij ID " + id + " is " + decode_str)
             time.sleep(2)
-            wachtwoorden(username, ID)
+            return wachtwoorden(username, ID)
 
         # Item aan de database toevoegen
         elif keuze == "3":
@@ -120,7 +120,7 @@ def start():
             else:
                 print ("Wachtwoorden kloppen niet. Probeer het opnieuw....")
                 time.sleep(2)
-                wachtwoorden(username)
+                return wachtwoorden(username)
 
             print ("Vul hier een omschrijving in van het item.")
             omschrijving = input ()
@@ -196,7 +196,7 @@ def start():
                     print ("Wachtwoorden komen niet overeen")
                     time.sleep(2)
 
-                wachtwoorden(username, ID)
+                return wachtwoorden(username, ID)
 
             # Omschrijving van een item veranderen
             elif keuze == "omschrijving":
@@ -213,7 +213,7 @@ def start():
                 print ("Input niet herkend. Probeer het opnieuw...")
                 time.sleep(2)
 
-            wachtwoorden(username, ID)
+            return wachtwoorden(username, ID)
 
         # Item uit de database verwijderen
         elif keuze == ("5"):
@@ -228,12 +228,12 @@ def start():
                 db.commit()
                 print ("Item is verwijderd...")
                 time.sleep(2)
-                wachtwoorden(username, ID)
+                return wachtwoorden(username, ID)
 
             else:
                 print ("De wijzegingen zijn niet aangebracht. De input klopt niet. Probeer het opnieuw....")
                 time.sleep(2)
-                wachtwoorden(username, ID)
+                return wachtwoorden(username, ID)
 
         # Wachtwoord genereren
         elif keuze == ("6"):
@@ -280,7 +280,7 @@ def start():
             print ("Het gegenereerde wachtwoord is: " + wachtwoord)
 
         elif keuze == "7":
-            funcgebruiker(username, db, cursor)
+            return funcgebruiker(username, db, cursor)
         # Stoppen
         elif keuze == ("8"):
             exit()
@@ -288,9 +288,9 @@ def start():
         else:
             print ("Keuze niet herkend...")
             time.sleep(2)
-            wachtwoorden(username,ID)
+            return wachtwoorden(username,ID)
 
-        wachtwoorden(username, ID)
+        return wachtwoorden(username, ID)
 
 
 
@@ -326,12 +326,12 @@ def start():
                     print ()
                     print ("Alle wachtwoorden zijn verwijderd.")
                     time.sleep(2)
-                    instellingen(username, ID)
 
                 else:
                     print ("Input verkeerd. De database is niet verwijderd")
                     time.sleep(2)
-                    instellingen(username, ID)
+                
+                return instellingen(username, ID)
 
 
         elif keuze == "2":
@@ -353,7 +353,7 @@ def start():
                     print ("Gebruiker is verwijderd.")
                     print ()
                     time.sleep (2)
-                    start ()
+                    return start ()
 
         elif keuze == "3":
             print()
@@ -393,7 +393,7 @@ def start():
                 if pwd != pwd1:
                     print ("Wachtwoorden komen niet overeen. Probeer het opnieuw...")
                     time.sleep(2)
-                    instellingen(username, ID)
+                    return instellingen(username, ID)
 
                 # Hier word een salt gegenereerd en gelijk daarna gehasht met het wachtwoord.
                 tekens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -417,7 +417,7 @@ def start():
                 print ("Het wachtwoord is onjuist. Probeer het opnieuw....")
                 time.sleep(2)
 
-            wachtwoorden(username, ID)
+            return wachtwoorden(username, ID)
 
         elif keuze == "4":
             print ()
@@ -460,15 +460,15 @@ def start():
             print ("Bewaar deze goed!")
             print()
             time.sleep(2)
-            instellingen(username, ID)
+            return instellingen(username, ID)
 
         elif keuze == "5":
-            funcgebruiker(username, db, cursor)
+            return funcgebruiker(username, db, cursor)
 
         else:
             print ("Keuze niet herkend. Probeer het opnieuw...")
             time.sleep(2)
-            instellingen(username, ID)
+            return instellingen(username, ID)
 
     def funcgebruiker (username, db, cursor):
         username = username
@@ -494,10 +494,10 @@ def start():
 
         keuze = input()
         if keuze == "1":
-            wachtwoorden(username, ID)
+            return wachtwoorden(username, ID)
 
         elif keuze == "2":
-            instellingen(username, ID)
+            return instellingen(username, ID)
 
         elif keuze == "3":
             exit()
@@ -524,7 +524,7 @@ def start():
             print ()
             print ("Gebruiker niet gevonden")
             time.sleep(2)
-            start()
+            return start()
 
 
         # Haalt het gehashte wachtwoord uit de database en haalt alle interpuncties die er aan zitten weg. Zo is het een schone string.
@@ -563,7 +563,7 @@ def start():
             time.sleep(2)
             inloggen(db, cursor)
 
-        funcgebruiker (username, db, cursor,)
+        return funcgebruiker (username, db, cursor,)
 
 
 
@@ -583,7 +583,7 @@ def start():
         if gebruiker != []:
             print ("Gebruikersnaam bestaat al. Probeer het openieuw...")
             time.sleep(2)
-            accountmaken(db, cursor)
+            return accountmaken(db, cursor)
 
         print ("Wat is het wachtwoord dat je wilt gebruiken")
         password = input()
@@ -599,7 +599,7 @@ def start():
             print ("Wachtwoorden komen niet overeen. Probeer het opnieuw...")
             print ()
             time.sleep (2)
-            accountmaken(db, cursor)
+            return accountmaken(db, cursor)
 
         password_checker(pwd = password)
 
@@ -611,7 +611,7 @@ def start():
             print("Hint mag het wachtwoord niet bevatten")
             print("Probeer het opnieuw....")
             time.sleep (2)
-            accountmaken(db, cursor)
+            return accountmaken(db, cursor)
 
         print("Samenvatting van de gegevens")
         print ()
@@ -635,7 +635,7 @@ def start():
         else:
             print ("invoer onjuist begin opnieuw...")
             time.sleep (2)
-            accountmaken(db, cursor)
+            return accountmaken(db, cursor)
 
         # Hier word een salt gegenereerd en gelijk daarna gehasht met het wachtwoord.
         tekens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -654,7 +654,7 @@ def start():
         print ("De herstel sleutel is: "+recoverykey)
         print ("Bewaar deze goed!")
         time.sleep (2)
-        start()
+        return start()
 
     def password_checker(pwd):
             pwd = pwd
@@ -677,27 +677,27 @@ def start():
                 print ("Probeer het opnieuw...")
                 print()
                 time.sleep (2)
-                accountmaken(db, cursor)
+                return accountmaken(db, cursor)
 
             elif letter_test == False:
                 print ("Het wachtwoord bevat geen hoofdletter en/of kleine letter.")
                 print ("Probeer het opnieuw...")
                 print()
                 time.sleep (2)
-                accountmaken(db, cursor)
+                return accountmaken(db, cursor)
 
             elif lengte_test < 10:
                 print ("Het wachtwoord voldoet niet aan de minimale lengte.")
                 print ("Probeer het opnieuw...")
                 time.sleep (2)
-                accountmaken(db, cursor)
+                return accountmaken(db, cursor)
 
             elif cijfer_test == False:
                 print("Het wachtwoord heeft geen cijfer(s).")
                 print("Probeer het opnieuw...")
                 print()
                 time.sleep (2)
-                accountmaken(db, cursor)
+                return accountmaken(db, cursor)
 
             elif any(str in leestekentest for str in pwd):
                 print ()
@@ -723,7 +723,7 @@ def start():
         if gebruiker == []:
             print ("Gebruikersnaam bestaat niet. Probeer het openieuw...")
             time.sleep(2)
-            wachtwoordresetten(db, cursor)
+            return wachtwoordresetten(db, cursor)
 
         print ("Wat is je herstelsleutel?")
         key = input()
@@ -741,7 +741,7 @@ def start():
             print ()
             print ("De herstelsleutel klopt niet. Probeer het opnieuw...")
             time.sleep(2)
-            wachtwoordresetten(db, cursor)
+            return wachtwoordresetten(db, cursor)
 
         print ()
         print ("Wat word het nieuwe wachtwoord?")
@@ -754,9 +754,7 @@ def start():
         if pwd != pwd2:
             print ()
             print ("De nieuwe wachtwoorden komen niet met elkaar overeen. Probeer het opnieuw...")
-            wachtwoordresetten(db, cursor)
-
-      
+            return wachtwoordresetten(db, cursor)
 
         # Hier word een nieuwe salt en hash gegenereerd
         tekens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -781,7 +779,7 @@ def start():
         print ()
         print ("Het wachtwoord is gewijzigd")
         time.sleep(2)
-        start()
+        return start()
         
     print ()
     print ("Password storage")
