@@ -137,6 +137,20 @@ def start():
             print ("Wat is het ID van het item dat je wilt aanpassen?")
             id = input()
             print ()
+            getuserid = """SELECT userid FROM `wachtwoorden` WHERE `ID` = %s"""
+            cursor.execute(getuserid, (id, ))
+            fetch = cursor.fetchall()
+            clean = str(fetch)
+            userid = re.sub(r'[^\w\s]', '', clean)
+
+            if userid == ID:
+                print()
+
+            else:
+                print("Je hebt geen toegang tot dit item. Geef een item op die wel van je is.")
+                time.sleep(2)
+                return wachtwoorden(username, ID)
+                
             print ("Wat wil je aanpassen? (naam/gebruikersnaam/wachtwoord/omschrijving)")
             keuze = input()
 
@@ -214,6 +228,21 @@ def start():
             print ("Vul het ID in van het item dat je wilt verwijderen.")
             id = input()
             print ()
+
+            getuserid = """SELECT userid FROM `wachtwoorden` WHERE `ID` = %s"""
+            cursor.execute(getuserid, (id, ))
+            fetch = cursor.fetchall()
+            clean = str(fetch)
+            userid = re.sub(r'[^\w\s]', '', clean)
+
+            if userid == ID:
+                print()
+
+            else:
+                print("Je hebt geen toegang tot dit item. Geef een item op die wel van je is.")
+                time.sleep(2)
+                return wachtwoorden(username, ID)
+            
             print ("Weet je het zeker? (y/n)")
             bevestiging = input()
             if bevestiging == "y":
@@ -775,7 +804,7 @@ def start():
         return start()
         
     print ()
-    print ("Password storage")
+    print ("Passwordmanager 1.0")
     print ()
     print ("1 - Inloggen")
     print ("2 - Account maken")
